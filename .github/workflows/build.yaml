@@ -2,14 +2,14 @@ name: Auto Build ETCD RPM
 
 on:
   push:
-    branches: [ "main", "release/**" ]
+    branches: ["main", "release/**"]
     tags:
       - "**"
     paths-ignore:
       - "docs/**"
   pull_request:
-    types: [ labeled, synchronize ]
-    branches: [ "release/**", "main", "dev/**" ]
+    types: [labeled, synchronize]
+    branches: ["release/**", "main", "dev/**"]
     paths-ignore:
       - "docs/**"
 
@@ -45,7 +45,7 @@ jobs:
         id: etcd_version
         shell: bash
         run: |
-          echo "##[set-output name=version;]$(cat ./Version)"
+          echo "##[set-output name=version;]$(cat ./VERSION)"
 
       - name: download etcd
         run: |
@@ -58,7 +58,7 @@ jobs:
       - name: Build rpm package
         run: |
           export VERSION=${{ steps.etcd_version.outputs.version }}
-          
+
           # build etcd rpm package
           version=${VERSION} nfpm pkg -p rpm -f nfpm.yaml -t etcd-${VERSION}.x86_64.rpm
 
