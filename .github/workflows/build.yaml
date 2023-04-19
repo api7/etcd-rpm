@@ -62,18 +62,19 @@ jobs:
           # build etcd rpm package
           version=${VERSION} nfpm pkg -p rpm -f nfpm.yaml -t etcd-${VERSION}.x86_64.rpm
 
-      - name: Run centos7 docker
+      - name: Install podman
         run: |
-          docker build --rm -t local/centos7-systemd .
-          docker run --privileged -itd -v $PWD:/app --name centos7Instance --net="host" local/centos7-systemd
+          sudo apt update
+          sudo apt -y install podman
 
       - name: Install rpm package in centos7 container
         run: |
           export VERSION=${{ steps.etcd_version.outputs.version }}
-          docker exec centos7Instance bash -c "cd app && rpm -qlp ./etcd-${VERSION}.x86_64.rpm && rpm -qip ./etcd-${VERSION}.x86_64.rpm && yum install -y ./etcd-${VERSION}.x86_64.rpm"
-          docker logs centos7Instance
-          # run etcd
-          docker exec centos7Instance bash -c "systemctl enable etcd.service && systemctl start etcd.service"
+          sudo podman run -d --name centos7Instance --systemd true --net host centos:7 /usr/lib/systemd/systemd
+          sudo podman cp etcd-${VERSION}.x86_64.rpm centos7Instance:/etcd-${VERSION}.x86_64.rpm
+          sudo podman exec centos7Instance rpm -ivh /etcd-${VERSION}.x86_64.rpm
+          sudo podman exec centos7Instance systemctl enable etcd.service
+          sudo podman exec centos7Instance systemctl start etcd.service
 
       - name: run test case
         run: |
