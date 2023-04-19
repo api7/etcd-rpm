@@ -2,14 +2,14 @@ name: Auto Build ETCD RPM
 
 on:
   push:
-    branches: [ "main", "release/**" ]
+    branches: ["main", "release/**"]
     tags:
       - "**"
     paths-ignore:
       - "docs/**"
   pull_request:
-    types: [ labeled, synchronize ]
-    branches: [ "release/**", "main", "dev/**" ]
+    types: [labeled, synchronize]
+    branches: ["release/**", "main", "dev/**"]
     paths-ignore:
       - "docs/**"
 
@@ -45,7 +45,7 @@ jobs:
         id: etcd_version
         shell: bash
         run: |
-          echo "##[set-output name=version;]$(cat ./Version)"
+          echo "##[set-output name=version;]$(cat ./VERSION)"
 
       - name: download etcd
         run: |
@@ -58,21 +58,21 @@ jobs:
       - name: Build rpm package
         run: |
           export VERSION=${{ steps.etcd_version.outputs.version }}
-          
+
           # build etcd rpm package
           version=${VERSION} nfpm pkg -p rpm -f nfpm.yaml -t etcd-${VERSION}.x86_64.rpm
 
       - name: Run centos7 docker
         run: |
-          docker run --privileged=true -itd -v $PWD:/app --name centos7Instance --net="host" docker.io/centos:7 /usr/sbin/init
+          docker run --privileged -itd -v $PWD:/app --name centos7Instance --net="host" docker.io/centos:7 /bin/bash
 
       - name: Install rpm package in centos7 container
         run: |
           export VERSION=${{ steps.etcd_version.outputs.version }}
-          docker exec centos7Instance bash -c "cd app && yum install -y ./etcd-${VERSION}.x86_64.rpm"
+          docker exec centos7Instance bash -c "cd app && rpm -qlp ./etcd-${VERSION}.x86_64.rpm && rpm -qip ./etcd-${VERSION}.x86_64.rpm && yum install -y ./etcd-${VERSION}.x86_64.rpm"
           docker logs centos7Instance
           # run etcd
-          docker exec centos7Instance bash -c "systemctl enable etcd.service && systemctl start etcd.service"
+          docker exec centos7Instance bash -c "/usr/local/bin/etcd --config-file=/etc/etcd/etcd.conf.yaml &"
 
       - name: run test case
         run: |
