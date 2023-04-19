@@ -97,4 +97,4 @@ jobs:
         run: |
           sudo pip install coscmd
           coscmd config -a ${SECRET_ID} -s ${SECRET_KEY} -b ${BUCKET} -e ${ENDPOINT}
-          coscmd upload ./apisix-build-tools/output/etcd-${{ steps.etcd_version.outputs.version }}.x86_64.rpm /workflows/rpms/
+          coscmd upload ./etcd-${{ steps.etcd_version.outputs.version }}.x86_64.rpm /workflows/rpms/
