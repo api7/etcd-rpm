@@ -1,0 +1,21 @@
+name: "etcd"
+version: "${version}"
+arch: "amd64"
+platform: "linux"
+description: "A distributed, reliable key-value store for the most critical data of a distributed system."
+license: "Apache License 2.0"
+
+contents:
+  - src: ./etcd
+    dst: /usr/local/bin/etcd
+  - src: ./etcdctl
+    dst: /usr/local/bin/etcdctl
+  - src: ./etcd.conf.yaml
+    dst: /etc/etcd/etcd.conf.yaml
+    type: config
+  - src: ./etcd.service
+    dst: /etc/systemd/system/etcd.service
+
+scripts:
+  preinstall: ./scripts/preinstall.sh
+  postinstall: ./scripts/postinstall.sh

@@ -1,0 +1,15 @@
+# This is the configuration file for the etcd server.
+
+# Human-readable name for this member.
+name: 'poc-cluster'
+
+# Path to the data directory.
+data-dir: /var/lib/etcd
+
+# List of comma separated URLs to listen on for peer traffic.
+listen-peer-urls: http://localhost:2380
+
+# List of comma separated URLs to listen on for client traffic.
+listen-client-urls: http://localhost:2379
+
+enable-grpc-gateway: true
