@@ -64,11 +64,12 @@ jobs:
 
       - name: Run centos7 docker
         run: |
-          docker run --privileged=true -itd -v $PWD:/app --name centos7Instance --net="host" docker.io/centos:7 /usr/sbin/init
+          docker run --privileged=true -itd -v $PWD:/app -p 2379:2379 --name centos7Instance --net="host" centos:7 /usr/sbin/init
 
       - name: Install rpm package in centos7 container
         run: |
           export VERSION=${{ steps.etcd_version.outputs.version }}
+          docker exec centos7Instance bash -c "rpm -qlp ./etcd-${VERSION}.x86_64.rpm && rpm -qip ./etcd-${VERSION}.x86_64.rpm"
           docker exec centos7Instance bash -c "cd app && yum install -y ./etcd-${VERSION}.x86_64.rpm"
           docker logs centos7Instance
           # run etcd
