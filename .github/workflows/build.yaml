@@ -64,7 +64,7 @@ jobs:
 
       - name: Run centos7 docker
         run: |
-          docker run --privileged=true -itd -v $PWD:/app -p 2379:2379 --name centos7Instance --net="host" centos:7 /usr/sbin/init
+          docker run --privileged=true -itd -v $PWD:/app --name centos7Instance --net="host" centos/systemd
 
       - name: Install rpm package in centos7 container
         run: |
