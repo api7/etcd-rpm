@@ -69,8 +69,7 @@ jobs:
       - name: Install rpm package in centos7 container
         run: |
           export VERSION=${{ steps.etcd_version.outputs.version }}
-          docker exec centos7Instance bash -c "rpm -qlp ./etcd-${VERSION}.x86_64.rpm && rpm -qip ./etcd-${VERSION}.x86_64.rpm"
-          docker exec centos7Instance bash -c "cd app && yum install -y ./etcd-${VERSION}.x86_64.rpm"
+          docker exec centos7Instance bash -c "cd app && rpm -qlp ./etcd-${VERSION}.x86_64.rpm && rpm -qip ./etcd-${VERSION}.x86_64.rpm && yum install -y ./etcd-${VERSION}.x86_64.rpm"
           docker logs centos7Instance
           # run etcd
           docker exec centos7Instance bash -c "systemctl enable etcd.service && systemctl start etcd.service"
