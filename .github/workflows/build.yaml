@@ -90,7 +90,7 @@ jobs:
 
       - name: Push to COS
         # Only triggered on new tag
-        # if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/')
         env:
           SECRET_ID: ${{ secrets.QCLOUD_COS_SECRETID }}
           SECRET_KEY: ${{ secrets.QCLOUD_COS_SECRETKEY }}
