@@ -23,7 +23,7 @@ jobs:
       contains(github.event.pull_request.labels.*.name, 'ci-all') ||
       github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') }}
     name: auto build etcd rpm package
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     timeout-minutes: 40
 
     steps:
@@ -70,11 +70,11 @@ jobs:
       - name: Install rpm package in centos7 container
         run: |
           export VERSION=${{ steps.etcd_version.outputs.version }}
-          sudo podman run -d --name centos7Instance --systemd true --net host centos:7 /usr/sbin/init
+          sudo podman run -d --name centos7Instance --systemd true --net host centos:7 /usr/lib/systemd/systemd
           sudo podman cp etcd-${VERSION}.x86_64.rpm centos7Instance:/etcd-${VERSION}.x86_64.rpm
-          sudo podman exec centos7Instance rpm -ivh /etcd-${VERSION}.x86_64.rpm
-          sudo podman exec centos7Instance systemctl enable etcd.service
-          sudo podman exec centos7Instance systemctl start etcd.service
+          sudo podman exec centos7Instance yum install /etcd-${VERSION}.x86_64.rpm
+          sudo podman exec centos7Instance systemctl enable etcd
+          sudo podman exec centos7Instance systemctl start etcd
 
       - name: run test case
         run: |
