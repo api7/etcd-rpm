@@ -81,14 +81,14 @@ jobs:
       - name: Create GitHub Release and Upload RPM
         uses: softprops/action-gh-release@v1
         # Only triggered on new tag
-        # if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           files: "etcd-${{ steps.etcd_version.outputs.version }}.x86_64.rpm"
           tag_name: ${{ steps.etcd_version.outputs.version }}
 
       - name: Push to COS
         # Only triggered on new tag
-        # if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/')
         env:
           SECRET_ID: ${{ secrets.QCLOUD_COS_SECRETID }}
           SECRET_KEY: ${{ secrets.QCLOUD_COS_SECRETKEY }}
