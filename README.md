@@ -10,6 +10,10 @@ First, update the [VERSION](./VERSION) file with the corresponding etcd version,
 
 After the PR is merged, create and push a tag, and wait for GitHub Actions to automatically release.
 
+## Download
+
+Please see [Releases](https://github.com/api7/etcd-rpm/releases)
+
 ## License
 
 This project is licensed under the Apache License 2.0. Please see the [LICENSE](./LICENSE) file for more information.
