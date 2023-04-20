@@ -1,7 +1,7 @@
 # This is the configuration file for the etcd server.
 
 # Human-readable name for this member.
-name: 'poc-cluster'
+name: 'etcd-cluster'
 
 # Path to the data directory.
 data-dir: /var/lib/etcd

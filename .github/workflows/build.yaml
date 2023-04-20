@@ -19,9 +19,6 @@ concurrency:
 
 jobs:
   auto_build_etcd_rpm:
-    if: ${{ contains(github.event.pull_request.labels.*.name, 'ci-build') ||
-      contains(github.event.pull_request.labels.*.name, 'ci-all') ||
-      github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') }}
     name: auto build etcd rpm package
     runs-on: ubuntu-20.04
     timeout-minutes: 40
@@ -81,12 +78,12 @@ jobs:
           export VERSION=${{ steps.etcd_version.outputs.version }}
           ./scripts/etcd_test.sh ${VERSION}
 
-      - name: Publish Artifact
-        uses: actions/upload-artifact@v2.2.3
+      - name: Create GitHub Release and Upload RPM
+        uses: softprops/action-gh-release@v1
+        # if: startsWith(github.ref, 'refs/tags/')
         with:
-          name: "etcd-rpm"
-          path: "./etcd-${{ steps.etcd_version.outputs.version }}.x86_64.rpm"
-          retention-days: 1
+          files: "etcd-${{ steps.etcd_version.outputs.version }}.x86_64.rpm"
+          tag_name: ${{ steps.etcd_version.outputs.version }}
 
       - name: Push to COS
         # Only triggered on new tag
