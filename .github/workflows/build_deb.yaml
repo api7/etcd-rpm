@@ -77,7 +77,7 @@ jobs:
           # sudo podman exec ubuntuInstance systemctl enable etcd
           # sudo podman exec ubuntuInstance systemctl start etcd
 
-          docker run -d --name ubuntuInstance --privileged --network host docker.io/ubuntu:20.04 /bin/bash
+          docker run --privileged=true -itd --name ubuntuInstance --net="host" docker.io/ubuntu:20.04 /bin/bash
           docker cp etcd-${VERSION}.x86_64.deb ubuntuInstance:/etcd-${VERSION}.x86_64.deb
           docker exec ubuntuInstance bash -c "dpkg -i /etcd-${VERSION}.x86_64.deb"
           docker exec ubuntuInstance bash -c "/usr/local/bin/etcd --config-file=/etc/etcd/etcd.conf.yaml &"
