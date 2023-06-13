@@ -68,21 +68,23 @@ jobs:
 
       - name: build ubuntu systemd image
         run: |
-          sudo podman build -f ubuntu.Dockerfile -t myubuntu:dev .
+          docker build -f ubuntu.Dockerfile -t myubuntu:dev .
 
       - name: Install deb package in ubuntu container
         run: |
           export VERSION=${{ steps.etcd_version.outputs.version }}
-          sudo podman run -d --name testInstance --systemd true --privileged --net host myubuntu:dev /usr/lib/systemd/systemd
-          sudo podman cp etcd-${VERSION}.x86_64.deb testInstance:/etcd-${VERSION}.x86_64.deb
-          sudo podman exec testInstance bash -c "dpkg -i /etcd-${VERSION}.x86_64.deb"
-          sudo podman exec testInstance systemctl enable etcd
-          sudo podman exec testInstance systemctl start etcd
+          # sudo podman run -d --name testInstance --systemd true --privileged --net host myubuntu:dev /usr/lib/systemd/systemd
+          # sudo podman cp etcd-${VERSION}.x86_64.deb testInstance:/etcd-${VERSION}.x86_64.deb
+          # sudo podman exec testInstance bash -c "dpkg -i /etcd-${VERSION}.x86_64.deb"
+          # sudo podman exec testInstance systemctl enable etcd
+          # sudo podman exec testInstance systemctl start etcd
 
-          # docker run --privileged=true -itd --name testInstance --net="host" docker.io/ubuntu:20.04 /bin/bash
-          # docker cp etcd-${VERSION}.x86_64.deb testInstance:/etcd-${VERSION}.x86_64.deb
-          # docker exec testInstance bash -c "dpkg -i /etcd-${VERSION}.x86_64.deb"
+          docker run --privileged=true -itd --name testInstance --net="host" myubuntu:dev /usr/lib/systemd/systemd
+          docker cp etcd-${VERSION}.x86_64.deb testInstance:/etcd-${VERSION}.x86_64.deb
+          docker exec testInstance bash -c "dpkg -i /etcd-${VERSION}.x86_64.deb"
           # docker exec testInstance bash -c "/usr/local/bin/etcd --config-file=/etc/etcd/etcd.conf.yaml &"
+          docker exec testInstance systemctl enable etcd
+          docker exec testInstance systemctl start etcd
 
       - name: run test case
         run: |
