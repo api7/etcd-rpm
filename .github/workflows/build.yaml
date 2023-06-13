@@ -67,11 +67,11 @@ jobs:
       - name: Install rpm package in centos7 container
         run: |
           export VERSION=${{ steps.etcd_version.outputs.version }}
-          sudo podman run -d --name centos7Instance --systemd true --privileged --net host centos:7 /usr/lib/systemd/systemd
-          sudo podman cp etcd-${VERSION}.x86_64.rpm centos7Instance:/etcd-${VERSION}.x86_64.rpm
-          sudo podman exec centos7Instance yum -y install /etcd-${VERSION}.x86_64.rpm
-          sudo podman exec centos7Instance systemctl enable etcd
-          sudo podman exec centos7Instance systemctl start etcd
+          sudo podman run -d --name testInstance --systemd true --privileged --net host centos:7 /usr/lib/systemd/systemd
+          sudo podman cp etcd-${VERSION}.x86_64.rpm testInstance:/etcd-${VERSION}.x86_64.rpm
+          sudo podman exec testInstance yum -y install /etcd-${VERSION}.x86_64.rpm
+          sudo podman exec testInstance systemctl enable etcd
+          sudo podman exec testInstance systemctl start etcd
 
       - name: run test case
         run: |
