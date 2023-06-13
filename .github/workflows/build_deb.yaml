@@ -57,7 +57,7 @@ jobs:
           export VERSION=${{ steps.etcd_version.outputs.version }}
 
           # build etcd deb package
-          version=${VERSION} nfpm pkg -p deb -f nfpm.yaml -t etcd-${VERSION}.x86_64.deb
+          version=${VERSION} nfpm pkg -p deb -f nfpm_deb.yaml -t etcd-${VERSION}.x86_64.deb
 
       - name: Publish Artifact
         uses: actions/upload-artifact@v2.2.3
@@ -85,7 +85,7 @@ jobs:
       - name: run test case
         run: |
           export VERSION=${{ steps.etcd_version.outputs.version }}
-          ./scripts/etcd_test.sh ${VERSION}
+          ./scripts/etcd_test_docker.sh ${VERSION}
 
       - name: Create GitHub Release and Upload DEB
         uses: softprops/action-gh-release@v1

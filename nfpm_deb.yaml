@@ -18,4 +18,3 @@ contents:
 
 scripts:
   preinstall: ./scripts/preinstall.sh
-  postinstall: ./scripts/postinstall.sh
