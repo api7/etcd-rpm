@@ -85,6 +85,7 @@ jobs:
           # docker exec testInstance bash -c "/usr/local/bin/etcd --config-file=/etc/etcd/etcd.conf.yaml &"
           docker exec testInstance systemctl enable etcd
           docker exec testInstance systemctl start etcd
+          docker exec testInstance systemctl status etcd
 
       - name: run test case
         run: |
