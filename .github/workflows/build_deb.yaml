@@ -68,7 +68,7 @@ jobs:
 
       - name: build ubuntu systemd image
         run: |
-          docker build -f ubuntu.Dockerfile -t myubuntu:dev .
+          sudo podman build -f ubuntu.Dockerfile -t myubuntu:dev .
 
       - name: Install deb package in ubuntu container
         run: |
