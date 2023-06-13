@@ -59,21 +59,28 @@ jobs:
           # build etcd deb package
           version=${VERSION} nfpm pkg -p deb -f nfpm.yaml -t etcd-${VERSION}.x86_64.deb
 
-      - name: Install podman
-        run: |
-          sudo apt update
-          sudo apt -y install podman
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v2.2.3
+        with:
+          name: "etcd-${{ steps.etcd_version.outputs.version }}.x86_64"
+          path: "./etcd-${{ steps.etcd_version.outputs.version }}.x86_64.deb"
+          retention-days: 1
 
       - name: Install deb package in ubuntu container
         run: |
           export VERSION=${{ steps.etcd_version.outputs.version }}
           # sudo podman run -d --name ubuntuInstance --systemd true --privileged --net host docker.io/ubuntu:20.04 /usr/lib/systemd/systemd
-          sudo podman run -d --name ubuntuInstance --systemd true --privileged --net host docker.io/ubuntu:20.04 /bin/bash
-          sudo podman cp etcd-${VERSION}.x86_64.deb ubuntuInstance:/etcd-${VERSION}.x86_64.deb
-          sudo podman exec ubuntuInstance bash -c "dpkg -i /etcd-${VERSION}.x86_64.deb"
-          sudo podman exec ubuntuInstance bash -c "/usr/local/bin/etcd --config-file=/etc/etcd/etcd.conf.yaml &"
+          # sudo podman run -d --name ubuntuInstance --systemd true --privileged --net host docker.io/ubuntu:20.04 /bin/bash
+          # sudo podman cp etcd-${VERSION}.x86_64.deb ubuntuInstance:/etcd-${VERSION}.x86_64.deb
+          # sudo podman exec ubuntuInstance bash -c "dpkg -i /etcd-${VERSION}.x86_64.deb"
+          # sudo podman exec ubuntuInstance bash -c "/usr/local/bin/etcd --config-file=/etc/etcd/etcd.conf.yaml &"
           # sudo podman exec ubuntuInstance systemctl enable etcd
           # sudo podman exec ubuntuInstance systemctl start etcd
+
+          docker run -d --name ubuntuInstance --privileged --network host docker.io/ubuntu:20.04 /bin/bash
+          docker cp etcd-${VERSION}.x86_64.deb ubuntuInstance:/etcd-${VERSION}.x86_64.deb
+          docker exec ubuntuInstance bash -c "dpkg -i /etcd-${VERSION}.x86_64.deb"
+          docker exec ubuntuInstance bash -c "/usr/local/bin/etcd --config-file=/etc/etcd/etcd.conf.yaml &"
 
       - name: run test case
         run: |
