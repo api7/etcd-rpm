@@ -1,4 +1,4 @@
-name: Auto Build ETCD RPM
+name: Auto Build ETCD DEB
 
 on:
   push:
@@ -14,12 +14,12 @@ on:
       - "docs/**"
 
 concurrency:
-  group: auto-build-etcd-rpm-${{ github.ref }}
+  group: auto-build-etcd-deb-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  auto_build_etcd_rpm:
-    name: auto build etcd rpm package
+  auto_build_etcd_deb:
+    name: auto build etcd deb package
     runs-on: ubuntu-20.04
     timeout-minutes: 40
 
@@ -52,24 +52,19 @@ jobs:
           # mv etcd and etcdctl to current folder
           mv etcd-v${VERSION}-linux-amd64/etcd etcd-v${VERSION}-linux-amd64/etcdctl .
 
-      - name: Build rpm package
+      - name: Build deb package
         run: |
           export VERSION=${{ steps.etcd_version.outputs.version }}
 
-          # build etcd rpm package
-          version=${VERSION} nfpm pkg -p rpm -f nfpm.yaml -t etcd-${VERSION}.x86_64.rpm
+          # build etcd deb package
+          version=${VERSION} nfpm pkg -p deb -f nfpm.yaml -t etcd-${VERSION}.x86_64.deb
 
-      - name: Install podman
-        run: |
-          sudo apt update
-          sudo apt -y install podman
-
-      - name: Install rpm package in centos7 container
+      - name: Install deb package in ubuntu container
         run: |
           export VERSION=${{ steps.etcd_version.outputs.version }}
-          sudo podman run -d --name testInstance --systemd true --privileged --net host centos:7 /usr/lib/systemd/systemd
-          sudo podman cp etcd-${VERSION}.x86_64.rpm testInstance:/etcd-${VERSION}.x86_64.rpm
-          sudo podman exec testInstance yum -y install /etcd-${VERSION}.x86_64.rpm
+          sudo podman run -d --name testInstance --systemd true --privileged --net host docker.io/jrei/systemd-ubuntu:20.04 /usr/lib/systemd/systemd
+          sudo podman cp etcd-${VERSION}.x86_64.deb testInstance:/etcd-${VERSION}.x86_64.deb
+          sudo podman exec testInstance bash -c "dpkg -i /etcd-${VERSION}.x86_64.deb"
           sudo podman exec testInstance systemctl enable etcd
           sudo podman exec testInstance systemctl start etcd
 
@@ -78,12 +73,12 @@ jobs:
           export VERSION=${{ steps.etcd_version.outputs.version }}
           ./scripts/etcd_test.sh ${VERSION}
 
-      - name: Create GitHub Release and Upload RPM
+      - name: Create GitHub Release and Upload DEB
         uses: softprops/action-gh-release@v1
         # Only triggered on new tag
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: "etcd-${{ steps.etcd_version.outputs.version }}.x86_64.rpm"
+          files: "etcd-${{ steps.etcd_version.outputs.version }}.x86_64.deb"
           tag_name: ${{ steps.etcd_version.outputs.version }}
 
       - name: Push to COS
@@ -97,4 +92,4 @@ jobs:
         run: |
           sudo pip install coscmd
           coscmd config -a ${SECRET_ID} -s ${SECRET_KEY} -b ${BUCKET} -e ${ENDPOINT}
-          coscmd upload ./etcd-${{ steps.etcd_version.outputs.version }}.x86_64.rpm /workflows/rpms/
+          coscmd upload ./etcd-${{ steps.etcd_version.outputs.version }}.x86_64.deb /workflows/debs/

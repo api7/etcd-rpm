@@ -18,8 +18,8 @@ fi
 
 # Write and read a key-value pair using etcdctl
 echo "Writing and reading a key-value pair using etcdctl..."
-sudo podman exec centos7Instance etcdctl put foo bar
-value=$(sudo podman exec centos7Instance etcdctl get foo | tail -n 1)
+sudo podman exec testInstance etcdctl put foo bar
+value=$(sudo podman exec testInstance etcdctl get foo | tail -n 1)
 if [[ "${value}" == "bar" ]]; then
   echo "Etcd key-value test passed"
 else
