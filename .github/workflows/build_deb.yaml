@@ -59,16 +59,10 @@ jobs:
           # build etcd deb package
           version=${VERSION} nfpm pkg -p deb -f nfpm.yaml -t etcd-${VERSION}.x86_64.deb
 
-      - name: build ubuntu systemd image
-        run: |
-          docker build -f ubuntu.Dockerfile -t myubuntu:dev .
-          docker save -o myubuntu.tar myubuntu:dev
-          sudo podman load -i myubuntu.tar
-
       - name: Install deb package in ubuntu container
         run: |
           export VERSION=${{ steps.etcd_version.outputs.version }}
-          sudo podman run -d --name testInstance --systemd true --privileged --net host myubuntu:dev /usr/lib/systemd/systemd
+          sudo podman run -d --name testInstance --systemd true --privileged --net host docker.io/jrei/systemd-ubuntu:20.04 /usr/lib/systemd/systemd
           sudo podman cp etcd-${VERSION}.x86_64.deb testInstance:/etcd-${VERSION}.x86_64.deb
           sudo podman exec testInstance bash -c "dpkg -i /etcd-${VERSION}.x86_64.deb"
           sudo podman exec testInstance systemctl enable etcd
